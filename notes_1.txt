@@ -1,0 +1,50 @@
+Database Design
+
+- Logical
+- Physical
+
+Database Development Life Cycle
+- Requirement Analysis
+  - Planning
+  - System definition
+- Database Design
+  - Logical Model
+  - Physical Model
+- Implementation
+  - Loading and Testing
+
+2 types of database techniques
+- Normalization
+  - 1NF - each cell must contain single value
+  - 2NF - it must be in 1NF, there should be a primary key
+  - 3NF - it must be in 2NF, has no transitive functional dependencies
+  - BCNF - Boyce-Codd NF / 3.5NF
+
+- ER Modeling - Entity Relationship
+
+=====================================
+
+MySQL
+
+- Database Handling
+
+Create Database Syntax
+- CREATE DATABASE [IF NOT EXISTS] database_name [CHARACTER SET charset_name] [COLLATE collation_name]
+
+
+How to check length and memory taken by each character ?
+
+SET @str = CONVERT('Hello World' USING utf8);
+SELECT LENGTH(@str), CHAR_LENGTH(@str);
+
+
+
+
+
+
+
+
+
+
+
+
