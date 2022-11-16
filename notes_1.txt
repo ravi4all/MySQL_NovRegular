@@ -61,6 +61,21 @@ CREATE TABLE IF NOT EXISTS users (user_id INT AUTO_INCREMENT PRIMARY KEY, userna
 CREATE TABLE IF NOT EXISTS books_issue (issue_id INT, book_id INT, user_id INT, issue_date DATE, due_date DATE, is_returned BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (issue_id), FOREIGN KEY (book_id) REFERENCES books (book_id), FOREIGN KEY (user_id) REFERENCES users (user_id));
 
 
+Foreign Key
+Foreign Key [col_name] REFERENCES parent_table (col_name)
+[ON DELETE ref_option]
+[ON UPDATE ref_option]
+
+
+CASCADE - value of matching rows in child table automatically gets deleted/updated
+SET NULL - value of matching rows will be set as NULL
+RESTRICT - rejects the deletion/updation on rows in parent table
+NO ACTION - same as RESTRICT
+SET DEFAULT - this action is rejected by InnoDB
+
+
+CREATE TABLE IF NOT EXISTS books_issue (issue_id INT, book_id INT, user_id INT, issue_date DATE, due_date DATE, is_returned BOOLEAN NOT NULL DEFAULT FALSE, PRIMARY KEY (issue_id), FOREIGN KEY (book_id) REFERENCES books (book_id), FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE CASCADE ON UPDATE CASCADE);
+
 
 Table Operations
 - Rename Table
@@ -87,9 +102,6 @@ DELETE Table
 
 TRUNCATE Table
 - more efficient than delete table, because it drops the table and recreate empty table
-
-
-
 
 Storage Engine
 - InnoDB  - 64 TB
@@ -138,7 +150,50 @@ SYNTAX : INSERT INTO table_name VALUES (v1, v2, v3...), (v1, v2...);
 INSERT INTO books (book_id, title, author, status, quantity) VALUES (101, "Python Programming", "XYZ", 1,10);
 INSERT INTO books (title, author, status, quantity) VALUES ("Let Us C", "John", 1,5);
 
-INSERT INTO books VALUES ("MySQL", "Shawn", 1,11);
+INSERT INTO books (title, author, status, quantity) VALUES ("Head First Python", "OReilly", 1,3), ("Head First Java", "OReilly", 1,19), ("Head First Javascript", "OReilly", 1,7), ("Speaking JS", "MDN", 1,3);
+
+
+Insert Multiple Row Limit
+SHOW VARIABLES LIKE 'max_allowed_packet';
+
+Set Size Limit
+SET GLOBAL max_allowed_packet=10000;
+
+
+Insert Into Select
+SYNTAX : INSERT INTO table_name(col_list) SELECT select_col_list FROM another_table WHERE condition;
+
+
+Insert Ignore
+SYNTAX : INSERT IGNORE INTO table_name (col_list) VALUES (col_list)
+
+
+INSERT IGNORE INTO books (book_id, title, author, status, quantity) VALUES (107,"Head First Python", "OReilly", 1,3), (108,"Head First Java", "OReilly", 1,19), (103,"Head First Javascript", "OReilly", 1,7), (104,"Speaking JS", "MDN", 1,3);
+
+=====================================================
+
+SELECT Query
+SYNTAX : SELECT col_list FROM table_name;
+
+SELECT * from books;
+
+SELECT 1+1;
+SELECT CONCAT("Ram"," ","Sharma");
+SELECT CONCAT("Ram"," ","Sharma") as "full name";
+
+Unique Rows
+Syntax : SELECT DISTINCT col_list FROM table_name;
+
+SELECT DISTINCT title, quantity from books;
+
+=====================================================
+
+Sorting Rows - ORDER BY
+SYNTAX : SELECT col_list FROM table ORDER BY [ASC|DESC];
+Query Execution Sequence - FROM -> SELECT -> ORDER BY
+
+SELECT title, quantity, stored_at from books ORDER BY quantity desc;
+SELECT title, quantity, stored_at from books ORDER BY quantity desc, title asc;
 
 
 
