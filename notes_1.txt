@@ -195,6 +195,47 @@ Query Execution Sequence - FROM -> SELECT -> ORDER BY
 SELECT title, quantity, stored_at from books ORDER BY quantity desc;
 SELECT title, quantity, stored_at from books ORDER BY quantity desc, title asc;
 
+=====================================================
+Where Clause
+- to filter data
+
+SYNTAX : SELECT * FROM table_name WHERE filter_condition;
+FROM -> WHERE -> SELECT
+
+SELECT * FROM books WHERE quantity >= 10;
+
+Keywords / Operators
+AND
+OR
+IN
+BETWEEN
+LIKE
+LIMIT
+
+
+AND Operator
+SELECT * FROM books WHERE quantity >= 10 AND author = "OReilly";
+
+OR Operator
+SELECT * FROM books WHERE quantity >= 10 OR author = "OReilly";
+
+AND + OR
+SELECT * FROM books WHERE author = "OReilly" and (quantity >= 10 or stored_at > '2022-11-15 20:00:00');
+
+SELECT * FROM books WHERE author = "OReilly" or author = "XYZ" or author = "John";
+
+Alternative for OR - IN Operator
+SELECT * FROM books WHERE author IN ("OReilly", "XYZ", "John");
+
+
+BETWEEN
+SELECT * FROM books WHERE quantity BETWEEN 5 AND 10;
+
+SELECT * FROM books WHERE quantity NOT BETWEEN 5 AND 10;
+
+SELECT * FROM books WHERE stored_at BETWEEN CAST('2022-11-01 20:00:00' AS DATETIME) AND CAST('2022-11-15 21:00:00' AS DATETIME);
+
+
 
 
 

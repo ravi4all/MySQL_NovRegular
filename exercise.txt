@@ -1,0 +1,6 @@
+Create table movies - m_id(pk), m_name, m_genre
+Create table users - u_id(pk), u_name, u_city
+Create table data - m_id(fk), u_id(fk), rating
+-------------------------------------------------------------------------------
+- Insert 10 records in each table
+- use select, order by, where, and, or, between with this data
