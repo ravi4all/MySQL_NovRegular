@@ -236,6 +236,179 @@ SELECT * FROM books WHERE quantity NOT BETWEEN 5 AND 10;
 SELECT * FROM books WHERE stored_at BETWEEN CAST('2022-11-01 20:00:00' AS DATETIME) AND CAST('2022-11-15 21:00:00' AS DATETIME);
 
 
+Limit Number of Rows
+SYNTAX : SELECT col_list FROM table_name LIMIT [offset, ] row_count;
+
+
+SELECT * FROM books LIMIT 5;
+
+Find books with highest quantity.
+Find books with second highest quantity.
+Find books with nth highest quantity.
+
+SELECT col_list FROM table_name ORDER BY col LIMIT n-1, 1;
+
+Find highest salary of employee.
+Find second highest salary of employee.
+Find Nth highest salary of employee.
+
+
+
+LIKE Operator
+- used for pattern matching
+
+Wildcard
+% wildcard
+_ wildcard
+
+a%			- starts with a
+%a			- ends with a
+%a%		- contains a
+
+a_		- matches any string starts with a and followed by any one other charcater
+a__		- matches any string starts with a and followed by any two other charcaters
+
+_a		- matches any string starts with any character and followed by a only
+
+Find names that contains a as middle character...
+_a_ 	- will return those names which contains 3 characters only and mid character is a
+Ram, Aam, Sam...
+
+
+SELECT * FROM books WHERE title LIKE '%python';
+
+SELECT * FROM books WHERE title LIKE '%\_a%';
+
+=====================================================
+Update Query
+
+SYNTAX : UPDATE table_name SET col_name = value, WHERE condition;
+UPDATE books SET quantity = 4 WHERE quantity = 3;
+
+UPDATE books SET title = "Head First Java V2",  quantity = 6 WHERE book_id = 104;
+
+Increment all quantities by 2;
+UPDATE books SET quantity = quantity + 2;
+
+Increment Salary of all employees by 10%;
+UPDATE employees SET salary = salary + (salary * 10/100);
+
+=====================================================
+
+Group By and Having Clause
+- Get total books of each author
+- Get count of all unique books/author
+
+SYNTAX : SELECT col_list, aggregate_function() from table_name WHERE condition GROUP BY col_list;
+
+FROM - WHERE - GROUP BY - SELECT ----
+
+aggregate_functions
+- min
+- max
+- avg
+- sum
+- count
+
+SELECT author from books GROUP BY author;
+SELECT author, count(*) from books GROUP BY author;
+SELECT author, count(*) as book_count from books GROUP BY author ORDER BY book_count DESC;
+SELECT author, sum(quantity) as total_books from books GROUP BY author;
+SELECT author, sum(quantity) as total_books from books GROUP BY author;
+
+SELECT author, sum(quantity) as total_books from books GROUP BY author HAVING total_books > 10;
+========================================
+
+Get total/avg/min/max salary of employees living in each city.
+SELECT emp_city, sum(salary) as total_salary FROM emps GROUP BY emp_city;
+SELECT emp_city, avg(salary) as avg_salary FROM emps GROUP BY emp_city;
+SELECT emp_city, min(salary) as min_salary FROM emps GROUP BY emp_city;
+SELECT emp_city, max(salary) as max_salary FROM emps GROUP BY emp_city;
+
+
+SELECT emp_city, sum(salary) as total_sal, max(salary) as max_salary, min(salary) as min_salary FROM emps GROUP BY emp_city;
+
+========================================
+
+Joins
+- Inner Join
+- Left Join
+- Right Join
+- Cross Join
+- Self Join
+- Outer Join (Not supported in MySQL)
+
+SYNTAX : SELECT col_list FROM table_1 INNER JOIN table_2 ON join_condition;
+
+
+LOAD DATA INFILE 'D:\users.csv' INTO TABLE users FIELDS TERMINATED BY ',' ENCLOSED BY '"' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
+SELECT b.title, b.author, i.user_id, i.issue_date, i.is_returned from books b INNER JOIN issued_books i ON b.book_id = i.book_id;
+
+SELECT b.title, b.author, i.user_id, count(i.user_id) as book_count from books b INNER JOIN issued_books i ON b.book_id = i.book_id group by user_id;
+
+SELECT b.title, b.author, i.user_id, i.issue_date, i.is_returned from books b LEFT JOIN issued_books i ON b.book_id = i.book_id;
+
+SELECT b.title, b.author, i.user_id, i.issue_date, i.is_returned from books b RIGHT JOIN issued_books i ON b.book_id = i.book_id;
+
+
+Get users who has not issued any book yet.
+Get users who has issued more than 2 books.
+Get books which are issued more than 2 times.
+Get users who issued Let Us C Only.
+Get count of each book number of times issued.
+Get book which is issued most number of times.
+Get user who issued most books.
+
+
+Self Join
+- compare successive rows
+
+SELECT t1.username, t2.username, t1.city FROM users t1 INNER JOIN users t2 ON t1.city=t2.city AND t1.username > t2.username;
+
+
+Cross Join
+SELECT t1.title, t1.author, t2.issue_date, t2.due_date FROM books t1 CROSS JOIN issued_books t2;
+
+
+Joining 3 tables
+SELECT t1.username, t2.title, t3.issue_date, t3.due_date, t3.is_returned FROM users t1 INNER JOIN issued_books t3 ON t1.user_id=t3.user_id INNER JOIN books t2 ON t2.book_id = t3.book_id;
+
+SELECT t1.username, t2.title, count(t1.username), t3.issue_date, t3.due_date, t3.is_returned FROM users t1 INNER JOIN issued_books t3 ON t1.user_id=t3.user_id INNER JOIN books t2 ON t2.book_id = t3.book_id WHERE t3.is_returned=0 GROUP BY t1.username;
+
+===========================================
+Nested/Sub Queries
+- evaluate sub query first and uses the result of sub query for outer query
+
+SELECT title, author, quantity FROM books WHERE quantity = (SELECT MAX(quantity) FROM books);
+SELECT title, author, quantity FROM books WHERE quantity > (SELECT AVG(quantity) FROM books);
+
+SELECT book_id, title, author FROM books WHERE book_id NOT IN (SELECT DISTINCT book_id FROM issued_books);
+
+SELECT book_id, title, author FROM books WHERE book_id IN (SELECT DISTINCT book_id FROM issued_books);
+
+===========================================
+
+Functions
+- String
+- Date and Time Functions
+- Control Flow Functions
+	- CASE
+	- IF
+	- IFNULL
+	- NULLIF
+- Windows Functions
+
+SELECT SUM(CASE WHEN is_returned = 1 THEN 1 ELSE 0 END) AS 'Returned', SUM(CASE WHEN is_returned = 0 THEN 1 ELSE 0 END) AS 'Not Returned Yet' FROM issued_books;
+
+SELECT issue_date, due_date, CASE WHEN is_returned = 1 THEN 'Returned on Time' ELSE 'Not Returned Yet' END AS 'is_ret' FROM issued_books;
+
+SELECT *, IF(quantity > 15, "Highly Available", "Available") AS Availability FROM books;
+
+
+Sum of books if returned or not using IF
+Get COUNT of users in each city without using group by
+ - each city will appear in a new column
 
 
 
