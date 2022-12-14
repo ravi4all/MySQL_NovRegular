@@ -1,0 +1,785 @@
+mysql> use library_db;
+Database changed
+mysql> CREATE TABLE student( ID INT PRIMARY KEY, NAME VARCHAR ( 200 ), HOBBY JSON, PHONE_NO JSON );
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> INSERT INTO student ( ID, NAME, HOBBY, PHONE_NO ) VALUES ( 1, 'STEVE',' ["CRICKET"," HOCKEY"]', '[9650121212, 9899598743]');
+Query OK, 1 row affected (0.01 sec)
+
+mysql>
+mysql> select * from student;
++----+-------+------------------------+--------------------------+
+| ID | NAME  | HOBBY                  | PHONE_NO                 |
++----+-------+------------------------+--------------------------+
+|  1 | STEVE | ["CRICKET", " HOCKEY"] | [9650121212, 9899598743] |
++----+-------+------------------------+--------------------------+
+1 row in set (0.00 sec)
+
+mysql> desc student;
++----------+--------------+------+-----+---------+-------+
+| Field    | Type         | Null | Key | Default | Extra |
++----------+--------------+------+-----+---------+-------+
+| ID       | int          | NO   | PRI | NULL    |       |
+| NAME     | varchar(200) | YES  |     | NULL    |       |
+| HOBBY    | json         | YES  |     | NULL    |       |
+| PHONE_NO | json         | YES  |     | NULL    |       |
++----------+--------------+------+-----+---------+-------+
+4 rows in set (0.02 sec)
+
+mysql> INSERT INTO student VALUES (2, 'John', '{"hobby_1" : "cricket", "hobby_2" : "football", "hobby_3" : ["chess", "ludo"]}', {"ph" : 989877798});
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '"ph" : 989877798})' at line 1
+mysql> INSERT INTO student VALUES (2, 'John', '{"hobby_1" : "cricket", "hobby_2" : "football", "hobby_3" : ["chess", "ludo"]}', '{"ph" : 989877798}');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> select * from student;
++----+-------+-----------------------------------------------------------------------------+--------------------------+
+| ID | NAME  | HOBBY                                                                       | PHONE_NO                 |
++----+-------+-----------------------------------------------------------------------------+--------------------------+
+|  1 | STEVE | ["CRICKET", " HOCKEY"]                                                      | [9650121212, 9899598743] |
+|  2 | John  | {"hobby_1": "cricket", "hobby_2": "football", "hobby_3": ["chess", "ludo"]} | {"ph": 989877798}        |
++----+-------+-----------------------------------------------------------------------------+--------------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.hobby_1' hobby FROM student;
++-------+-----------+
+| NAME  | hobby     |
++-------+-----------+
+| STEVE | NULL      |
+| John  | "cricket" |
++-------+-----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.hobby_3' hobby FROM student;
++-------+-------------------+
+| NAME  | hobby             |
++-------+-------------------+
+| STEVE | NULL              |
+| John  | ["chess", "ludo"] |
++-------+-------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.*' hobby FROM student;
++-------+--------------------------------------------+
+| NAME  | hobby                                      |
++-------+--------------------------------------------+
+| STEVE | NULL                                       |
+| John  | ["cricket", "football", ["chess", "ludo"]] |
++-------+--------------------------------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.hobby_3' hobby FROM student;
++-------+-------------------+
+| NAME  | hobby             |
++-------+-------------------+
+| STEVE | NULL              |
+| John  | ["chess", "ludo"] |
++-------+-------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.hobby_3[0]' hobby FROM student;
++-------+---------+
+| NAME  | hobby   |
++-------+---------+
+| STEVE | NULL    |
+| John  | "chess" |
++-------+---------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT NAME, HOBBY->'$.hobby_3[1]' hobby FROM student;
++-------+--------+
+| NAME  | hobby  |
++-------+--------+
+| STEVE | NULL   |
+| John  | "ludo" |
++-------+--------+
+2 rows in set (0.00 sec)
+
+mysql> desc student table;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table' at line 1
+mysql> desc table student;
++----+-------------+---------+------------+------+---------------+------+---------+------+------+----------+-------+
+| id | select_type | table   | partitions | type | possible_keys | key  | key_len | ref  | rows | filtered | Extra |
++----+-------------+---------+------------+------+---------------+------+---------+------+------+----------+-------+
+|  1 | SIMPLE      | student | NULL       | ALL  | NULL          | NULL | NULL    | NULL |    2 |   100.00 | NULL  |
++----+-------------+---------+------------+------+---------------+------+---------+------+------+----------+-------+
+1 row in set, 1 warning (0.00 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| bookinfo           |
+| bookmyshow         |
+| chat_db            |
+| dit_chat_db        |
+| emp_management     |
+| information_schema |
+| java_chat_db       |
+| library_db         |
+| library_db_backup  |
+| mysql              |
+| netflix            |
+| new_db             |
+| performance_schema |
+| prime_db           |
+| projects_db        |
+| sakila             |
+| samsung            |
+| shopapp            |
+| socialmedia        |
+| sports_db          |
+| students_db        |
+| sys                |
+| world              |
++--------------------+
+23 rows in set (0.01 sec)
+
+mysql> select * from books;
++---------+-----------------------+---------+--------+----------+---------------------+
+| book_id | title                 | author  | status | quantity | stored_at           |
++---------+-----------------------+---------+--------+----------+---------------------+
+|     101 | Python Programming    | XYZ     |      1 |       12 | 2022-11-15 20:50:17 |
+|     102 | Let Us C              | John    |      1 |        7 | 2022-11-15 20:51:20 |
+|     103 | Head First Python     | OReilly |      1 |        6 | 2022-11-16 20:21:41 |
+|     104 | Head First Java V2    | OReilly |      1 |        8 | 2022-11-16 20:21:41 |
+|     105 | Head First Javascript | OReilly |      1 |        9 | 2022-11-16 20:21:41 |
+|     106 | Speaking JS           | MDN     |      1 |        6 | 2022-11-16 20:21:41 |
+|     107 | Head First Python     | OReilly |      1 |        6 | 2022-11-16 20:33:36 |
+|     108 | Head First Java       | OReilly |      1 |       21 | 2022-11-16 20:33:36 |
++---------+-----------------------+---------+--------+----------+---------------------+
+8 rows in set (0.02 sec)
+
+mysql> SELECT LENGTH(title) FROM books;
++---------------+
+| LENGTH(title) |
++---------------+
+|            18 |
+|             8 |
+|            17 |
+|            18 |
+|            21 |
+|            11 |
+|            17 |
+|            15 |
++---------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT LEFT(title, 5) FROM books;
++----------------+
+| LEFT(title, 5) |
++----------------+
+| Pytho          |
+| Let U          |
+| Head           |
+| Head           |
+| Head           |
+| Speak          |
+| Head           |
+| Head           |
++----------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT title, LEFT(title, 5) FROM books;
++-----------------------+----------------+
+| title                 | LEFT(title, 5) |
++-----------------------+----------------+
+| Python Programming    | Pytho          |
+| Let Us C              | Let U          |
+| Head First Python     | Head           |
+| Head First Java V2    | Head           |
+| Head First Javascript | Head           |
+| Speaking JS           | Speak          |
+| Head First Python     | Head           |
+| Head First Java       | Head           |
++-----------------------+----------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT title, RIGHT(title, 5) FROM books;
++-----------------------+-----------------+
+| title                 | RIGHT(title, 5) |
++-----------------------+-----------------+
+| Python Programming    | mming           |
+| Let Us C              |  Us C           |
+| Head First Python     | ython           |
+| Head First Java V2    | va V2           |
+| Head First Javascript | cript           |
+| Speaking JS           | ng JS           |
+| Head First Python     | ython           |
+| Head First Java       |  Java           |
++-----------------------+-----------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT LTRIM('   Ravi');
++------------------+
+| LTRIM('   Ravi') |
++------------------+
+| Ravi             |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT LTRIM('   Ravi   ');
++---------------------+
+| LTRIM('   Ravi   ') |
++---------------------+
+| Ravi                |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT RTRIM('   Ravi   ');
++---------------------+
+| RTRIM('   Ravi   ') |
++---------------------+
+|    Ravi             |
++---------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT TRIM('   Ravi   ');
++--------------------+
+| TRIM('   Ravi   ') |
++--------------------+
+| Ravi               |
++--------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT LOWER('RaVI');
++---------------+
+| LOWER('RaVI') |
++---------------+
+| ravi          |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT UPPER('RaVI');
++---------------+
+| UPPER('RaVI') |
++---------------+
+| RAVI          |
++---------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 1);
++-------------------------------+
+| SUBSTRING('This is MySQL', 1) |
++-------------------------------+
+| This is MySQL                 |
++-------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 2);
++-------------------------------+
+| SUBSTRING('This is MySQL', 2) |
++-------------------------------+
+| his is MySQL                  |
++-------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 5);
++-------------------------------+
+| SUBSTRING('This is MySQL', 5) |
++-------------------------------+
+|  is MySQL                     |
++-------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', -4);
++--------------------------------+
+| SUBSTRING('This is MySQL', -4) |
++--------------------------------+
+| ySQL                           |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', -14);
++---------------------------------+
+| SUBSTRING('This is MySQL', -14) |
++---------------------------------+
+|                                 |
++---------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', -1);
++--------------------------------+
+| SUBSTRING('This is MySQL', -1) |
++--------------------------------+
+| L                              |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', -2);
++--------------------------------+
+| SUBSTRING('This is MySQL', -2) |
++--------------------------------+
+| QL                             |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', -7);
++--------------------------------+
+| SUBSTRING('This is MySQL', -7) |
++--------------------------------+
+| s MySQL                        |
++--------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT UPPER(title) FROM books;
++-----------------------+
+| UPPER(title)          |
++-----------------------+
+| PYTHON PROGRAMMING    |
+| LET US C              |
+| HEAD FIRST PYTHON     |
+| HEAD FIRST JAVA V2    |
+| HEAD FIRST JAVASCRIPT |
+| SPEAKING JS           |
+| HEAD FIRST PYTHON     |
+| HEAD FIRST JAVA       |
++-----------------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT * FROM books;
++---------+-----------------------+---------+--------+----------+---------------------+
+| book_id | title                 | author  | status | quantity | stored_at           |
++---------+-----------------------+---------+--------+----------+---------------------+
+|     101 | Python Programming    | XYZ     |      1 |       12 | 2022-11-15 20:50:17 |
+|     102 | Let Us C              | John    |      1 |        7 | 2022-11-15 20:51:20 |
+|     103 | Head First Python     | OReilly |      1 |        6 | 2022-11-16 20:21:41 |
+|     104 | Head First Java V2    | OReilly |      1 |        8 | 2022-11-16 20:21:41 |
+|     105 | Head First Javascript | OReilly |      1 |        9 | 2022-11-16 20:21:41 |
+|     106 | Speaking JS           | MDN     |      1 |        6 | 2022-11-16 20:21:41 |
+|     107 | Head First Python     | OReilly |      1 |        6 | 2022-11-16 20:33:36 |
+|     108 | Head First Java       | OReilly |      1 |       21 | 2022-11-16 20:33:36 |
++---------+-----------------------+---------+--------+----------+---------------------+
+8 rows in set (0.00 sec)
+
+mysql> UPDATE books SET title = UPPER(title);
+Query OK, 8 rows affected (0.00 sec)
+Rows matched: 8  Changed: 8  Warnings: 0
+
+mysql> SELECT * FROM books;
++---------+-----------------------+---------+--------+----------+---------------------+
+| book_id | title                 | author  | status | quantity | stored_at           |
++---------+-----------------------+---------+--------+----------+---------------------+
+|     101 | PYTHON PROGRAMMING    | XYZ     |      1 |       12 | 2022-11-15 20:50:17 |
+|     102 | LET US C              | John    |      1 |        7 | 2022-11-15 20:51:20 |
+|     103 | HEAD FIRST PYTHON     | OReilly |      1 |        6 | 2022-11-16 20:21:41 |
+|     104 | HEAD FIRST JAVA V2    | OReilly |      1 |        8 | 2022-11-16 20:21:41 |
+|     105 | HEAD FIRST JAVASCRIPT | OReilly |      1 |        9 | 2022-11-16 20:21:41 |
+|     106 | SPEAKING JS           | MDN     |      1 |        6 | 2022-11-16 20:21:41 |
+|     107 | HEAD FIRST PYTHON     | OReilly |      1 |        6 | 2022-11-16 20:33:36 |
+|     108 | HEAD FIRST JAVA       | OReilly |      1 |       21 | 2022-11-16 20:33:36 |
++---------+-----------------------+---------+--------+----------+---------------------+
+8 rows in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 5);
++-------------------------------+
+| SUBSTRING('This is MySQL', 5) |
++-------------------------------+
+|  is MySQL                     |
++-------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 1, 5);
++----------------------------------+
+| SUBSTRING('This is MySQL', 1, 5) |
++----------------------------------+
+| This                             |
++----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 3, 5);
++----------------------------------+
+| SUBSTRING('This is MySQL', 3, 5) |
++----------------------------------+
+| is is                            |
++----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', 3, 10);
++-----------------------------------+
+| SUBSTRING('This is MySQL', 3, 10) |
++-----------------------------------+
+| is is MySQ                        |
++-----------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL', FROM 1 FOR 5);
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'FROM 1 FOR 5)' at line 1
+mysql> SELECT SUBSTRING('This is MySQL' FROM 1 FOR 5);
++-----------------------------------------+
+| SUBSTRING('This is MySQL' FROM 1 FOR 5) |
++-----------------------------------------+
+| This                                    |
++-----------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL' FROM 1 FOR 6);
++-----------------------------------------+
+| SUBSTRING('This is MySQL' FROM 1 FOR 6) |
++-----------------------------------------+
+| This i                                  |
++-----------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL' FROM 3 FOR 6);
++-----------------------------------------+
+| SUBSTRING('This is MySQL' FROM 3 FOR 6) |
++-----------------------------------------+
+| is is                                   |
++-----------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT SUBSTRING('This is MySQL' FROM 4 FOR 6);
++-----------------------------------------+
+| SUBSTRING('This is MySQL' FROM 4 FOR 6) |
++-----------------------------------------+
+| s is M                                  |
++-----------------------------------------+
+1 row in set (0.00 sec)
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| bookinfo           |
+| bookmyshow         |
+| chat_db            |
+| dit_chat_db        |
+| emp_management     |
+| information_schema |
+| java_chat_db       |
+| library_db         |
+| library_db_backup  |
+| mysql              |
+| netflix            |
+| new_db             |
+| performance_schema |
+| prime_db           |
+| projects_db        |
+| sakila             |
+| samsung            |
+| shopapp            |
+| socialmedia        |
+| sports_db          |
+| students_db        |
+| sys                |
+| world              |
++--------------------+
+23 rows in set (0.00 sec)
+
+mysql> use shopapp;
+Database changed
+mysql> show tables;
++-------------------+
+| Tables_in_shopapp |
++-------------------+
+| author            |
+| book_mast         |
+| category          |
+| customers         |
+| employees         |
+| orders            |
+| products          |
+| sales             |
+| sales_2           |
+| shares            |
+| users             |
++-------------------+
+11 rows in set (0.01 sec)
+
+mysql> select * from sales;
++---------------+-------------+------+
+| sales_empName | fiscal_year | sale |
++---------------+-------------+------+
+| John          |        2019 |  120 |
+| John          |        2020 |  150 |
+| John          |        2021 |  200 |
+| Sam           |        2019 |  150 |
+| Sam           |        2020 |  180 |
+| Sam           |        2021 |  200 |
+| Tom           |        2019 |  200 |
+| Tom           |        2020 |  150 |
+| Tom           |        2021 |  250 |
++---------------+-------------+------+
+9 rows in set (0.02 sec)
+
+mysql> SELECT fiscal_year, SUM(sale) FROM sales GROUP BY fiscal_year;
++-------------+-----------+
+| fiscal_year | SUM(sale) |
++-------------+-----------+
+|        2019 |       470 |
+|        2020 |       480 |
+|        2021 |       650 |
++-------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, SUM(sale) FROM sales GROUP BY sales_empName;
++-------------+-----------+
+| fiscal_year | SUM(sale) |
++-------------+-----------+
+|        2019 |       470 |
+|        2019 |       530 |
+|        2019 |       600 |
++-------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT sales_empName, SUM(sale) FROM sales GROUP BY sales_empName;
++---------------+-----------+
+| sales_empName | SUM(sale) |
++---------------+-----------+
+| John          |       470 |
+| Sam           |       530 |
+| Tom           |       600 |
++---------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, SUM(sale) FROM sales GROUP BY fiscal_year;
++-------------+-----------+
+| fiscal_year | SUM(sale) |
++-------------+-----------+
+|        2019 |       470 |
+|        2020 |       480 |
+|        2021 |       650 |
++-------------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY fiscal_year) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |         470 |
+|        2019 | Sam           |  150 |         470 |
+|        2019 | Tom           |  200 |         470 |
+|        2020 | John          |  150 |         480 |
+|        2020 | Sam           |  180 |         480 |
+|        2020 | Tom           |  150 |         480 |
+|        2021 | John          |  200 |         650 |
+|        2021 | Sam           |  200 |         650 |
+|        2021 | Tom           |  250 |         650 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY sales_empName) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |         470 |
+|        2020 | John          |  150 |         470 |
+|        2021 | John          |  200 |         470 |
+|        2019 | Sam           |  150 |         530 |
+|        2020 | Sam           |  180 |         530 |
+|        2021 | Sam           |  200 |         530 |
+|        2019 | Tom           |  200 |         600 |
+|        2020 | Tom           |  150 |         600 |
+|        2021 | Tom           |  250 |         600 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY sales_empName ORDER BY sale) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |         120 |
+|        2020 | John          |  150 |         270 |
+|        2021 | John          |  200 |         470 |
+|        2019 | Sam           |  150 |         150 |
+|        2020 | Sam           |  180 |         330 |
+|        2021 | Sam           |  200 |         530 |
+|        2020 | Tom           |  150 |         150 |
+|        2019 | Tom           |  200 |         350 |
+|        2021 | Tom           |  250 |         600 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY sales_empName ORDER BY sales_empName) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |         470 |
+|        2020 | John          |  150 |         470 |
+|        2021 | John          |  200 |         470 |
+|        2019 | Sam           |  150 |         530 |
+|        2020 | Sam           |  180 |         530 |
+|        2021 | Sam           |  200 |         530 |
+|        2019 | Tom           |  200 |         600 |
+|        2020 | Tom           |  150 |         600 |
+|        2021 | Tom           |  250 |         600 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY sales_empName ORDER BY fiscal_year) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |         120 |
+|        2020 | John          |  150 |         270 |
+|        2021 | John          |  200 |         470 |
+|        2019 | Sam           |  150 |         150 |
+|        2020 | Sam           |  180 |         330 |
+|        2021 | Sam           |  200 |         530 |
+|        2019 | Tom           |  200 |         200 |
+|        2020 | Tom           |  150 |         350 |
+|        2021 | Tom           |  250 |         600 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, SUM(sale) OVER (PARTITION BY sales_empName ORDER BY fiscal_year DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2021 | John          |  200 |         200 |
+|        2020 | John          |  150 |         350 |
+|        2019 | John          |  120 |         470 |
+|        2021 | Sam           |  200 |         200 |
+|        2020 | Sam           |  180 |         380 |
+|        2019 | Sam           |  150 |         530 |
+|        2021 | Tom           |  250 |         250 |
+|        2020 | Tom           |  150 |         400 |
+|        2019 | Tom           |  200 |         600 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, RANK() OVER (PARTITION BY sales_empName ORDER BY fiscal_year DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2021 | John          |  200 |           1 |
+|        2020 | John          |  150 |           2 |
+|        2019 | John          |  120 |           3 |
+|        2021 | Sam           |  200 |           1 |
+|        2020 | Sam           |  180 |           2 |
+|        2019 | Sam           |  150 |           3 |
+|        2021 | Tom           |  250 |           1 |
+|        2020 | Tom           |  150 |           2 |
+|        2019 | Tom           |  200 |           3 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, RANK() OVER (PARTITION BY fiscal_year ORDER BY fiscal_year DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |           1 |
+|        2019 | Sam           |  150 |           1 |
+|        2019 | Tom           |  200 |           1 |
+|        2020 | John          |  150 |           1 |
+|        2020 | Sam           |  180 |           1 |
+|        2020 | Tom           |  150 |           1 |
+|        2021 | John          |  200 |           1 |
+|        2021 | Sam           |  200 |           1 |
+|        2021 | Tom           |  250 |           1 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, RANK() OVER (PARTITION BY fiscal_year ORDER BY sale DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | Tom           |  200 |           1 |
+|        2019 | Sam           |  150 |           2 |
+|        2019 | John          |  120 |           3 |
+|        2020 | Sam           |  180 |           1 |
+|        2020 | John          |  150 |           2 |
+|        2020 | Tom           |  150 |           2 |
+|        2021 | Tom           |  250 |           1 |
+|        2021 | John          |  200 |           2 |
+|        2021 | Sam           |  200 |           2 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, DENSE_RANK() OVER (PARTITION BY fiscal_year ORDER BY sale DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | Tom           |  200 |           1 |
+|        2019 | Sam           |  150 |           2 |
+|        2019 | John          |  120 |           3 |
+|        2020 | Sam           |  180 |           1 |
+|        2020 | John          |  150 |           2 |
+|        2020 | Tom           |  150 |           2 |
+|        2021 | Tom           |  250 |           1 |
+|        2021 | John          |  200 |           2 |
+|        2021 | Sam           |  200 |           2 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, DENSE_RANK() OVER (PARTITION BY fiscal_year ORDER BY sale) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |           1 |
+|        2019 | Sam           |  150 |           2 |
+|        2019 | Tom           |  200 |           3 |
+|        2020 | John          |  150 |           1 |
+|        2020 | Tom           |  150 |           1 |
+|        2020 | Sam           |  180 |           2 |
+|        2021 | John          |  200 |           1 |
+|        2021 | Sam           |  200 |           1 |
+|        2021 | Tom           |  250 |           2 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, RANK() OVER (PARTITION BY fiscal_year ORDER BY sale) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 |           1 |
+|        2019 | Sam           |  150 |           2 |
+|        2019 | Tom           |  200 |           3 |
+|        2020 | John          |  150 |           1 |
+|        2020 | Tom           |  150 |           1 |
+|        2020 | Sam           |  180 |           3 |
+|        2021 | John          |  200 |           1 |
+|        2021 | Sam           |  200 |           1 |
+|        2021 | Tom           |  250 |           3 |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, FIRST_VALUE(sales_empName) OVER (PARTITION BY fiscal_year ORDER BY sale) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 | John        |
+|        2019 | Sam           |  150 | John        |
+|        2019 | Tom           |  200 | John        |
+|        2020 | John          |  150 | John        |
+|        2020 | Tom           |  150 | John        |
+|        2020 | Sam           |  180 | John        |
+|        2021 | John          |  200 | John        |
+|        2021 | Sam           |  200 | John        |
+|        2021 | Tom           |  250 | John        |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, FIRST_VALUE(sales_empName) OVER (PARTITION BY fiscal_year) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | John          |  120 | John        |
+|        2019 | Sam           |  150 | John        |
+|        2019 | Tom           |  200 | John        |
+|        2020 | John          |  150 | John        |
+|        2020 | Sam           |  180 | John        |
+|        2020 | Tom           |  150 | John        |
+|        2021 | John          |  200 | John        |
+|        2021 | Sam           |  200 | John        |
+|        2021 | Tom           |  250 | John        |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql> SELECT fiscal_year, sales_empName, sale, FIRST_VALUE(sales_empName) OVER (PARTITION BY fiscal_year ORDER BY sale DESC) total_sales FROM sales;
++-------------+---------------+------+-------------+
+| fiscal_year | sales_empName | sale | total_sales |
++-------------+---------------+------+-------------+
+|        2019 | Tom           |  200 | Tom         |
+|        2019 | Sam           |  150 | Tom         |
+|        2019 | John          |  120 | Tom         |
+|        2020 | Sam           |  180 | Sam         |
+|        2020 | John          |  150 | Sam         |
+|        2020 | Tom           |  150 | Sam         |
+|        2021 | Tom           |  250 | Tom         |
+|        2021 | John          |  200 | Tom         |
+|        2021 | Sam           |  200 | Tom         |
++-------------+---------------+------+-------------+
+9 rows in set (0.00 sec)
+
+mysql>

@@ -410,6 +410,79 @@ Sum of books if returned or not using IF
 Get COUNT of users in each city without using group by
  - each city will appear in a new column
 
+=====================================
+
+Date and Time Functions
+SELECT CURDATE();
+SELECT CURDATE(), CURRENT_DATE(), CURRENT_DATE;
+SELECT NOW();
+SELECT DATE(NOW());
+SELECT TIME(NOW());
+
+SELECT CURDATE(), DAY(CURDATE());
+SELECT DATE(stored_at), count(*) FROM books GROUP BY DAY(stored_at);
+
+SELECT issue_date, count(*) FROM issued_books GROUP BY DAY(issue_date);
+
+
+SELECT MONTH(CURDATE());
+SELECT issue_date, count(*) FROM issued_books GROUP BY MONTH(issue_date);
+
+SELECT WEEK(CURDATE());
+SELECT DAYNAME(CURDATE());
+SELECT WEEKDAY(CURDATE());
+0-Monday, 1-Tuesday, 2-Wednesday.....6-Sunday
+
+SELECT YEAR(CURDATE());
+
+
+SELECT DATEDIFF(date_1, date_2);
+SELECT DATEDIFF(CURDATE(), '2020-10-10');
+SELECT DATEDIFF('2022-12-20', CURDATE());
+
+
+SELECT DATE_ADD(start_date, INTERVAL, expr unit);
+SELECT DATE_ADD(NOW(), INTERVAL 2 MONTH) result;
+SELECT DATE_ADD(NOW(), INTERVAL 2 DAY) result;
+
+SELECT DATE_SUB(NOW(), INTERVAL 2 MONTH) result;
+
+SELECT TIMESTAMPDIFF(MONTH, '2021-10-12', CURDATE());
+SELECT PERIOD_DIFF(EXTRACT(MONTH FROM CURDATE()), EXTRACT(MONTH FROM '2022-04-03')) as month_diff;
+
+Format of date that we pass in PERIOD_DIFF - YYMM / YYYYMM
+SELECT PERIOD_DIFF(202212,202010);
+
+============================================
+String Functions
+
+LENGTH
+LEFT
+RIGHT
+LTRIM
+RTRIM
+TRIM
+LOWER
+UPPER
+REPLACE
+SUBSTRING
+CONCAT
+
+============================================
+Windows Functions
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
